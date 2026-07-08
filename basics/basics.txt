@@ -1,0 +1,27 @@
+Day1:
+
+Hello everyone , 
+this is the basics of the my new started python course.
+we have learnt what are the roadmap, things we have to learn till mow.
+we have also learnt datatypes,variables,datastructures.
+datatyoes like integer,string,boolean,float.
+datastructures like:
+string: {}(mutable datastructures having the flower brackets)
+tuples: [](immutable datastructures having the large brackets)
+list:   ()(mutable datastructures having the small brackets)
+now we will be learning about the operators like:
+addition :
+substraction:
+multiplication:
+division:
+exponentiation:
+floor division:
+modulation:
+now we will be learning about the control flows:
+like 
+if
+if-else
+elif
+while 
+do-while
+
