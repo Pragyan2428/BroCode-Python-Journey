@@ -1,0 +1,404 @@
+# Git & GitHub — Complete Course Notes
+
+*Structured to follow the "Git and GitHub Tutorial For Beginners (Full Course)" chapter list.*
+
+---
+
+## 1. What Is Git?
+
+Git is a **Version Control System (VCS)** — software that records changes to files over time so you can recall specific versions later, compare changes, and collaborate without overwriting each other's work.
+
+**Created by Linus Torvalds** (creator of Linux) in **2005**.
+
+### The "Linus Torvalds got angry" story
+Before Git existed, the Linux kernel team used a proprietary VCS called **BitKeeper**, given to them for free by its company. In 2005, BitKeeper revoked free access after a dispute (a developer reverse-engineered part of its protocol). Torvalds — frustrated with the sudden loss of a tool that thousands of contributors depended on — decided no company should ever be able to pull the rug out from under an open-source project like that again. He built Git in about **10 days** as a fast, free, distributed alternative, explicitly designed so no single company could control it.
+
+---
+
+## 2. Centralized vs Distributed Version Control Systems
+
+| | **Centralized VCS (CVCS)** | **Distributed VCS (DVCS)** |
+|---|---|---|
+| Examples | SVN, CVS, Perforce | **Git**, Mercurial |
+| History stored | Only on one central server | Full history on **every** developer's machine |
+| Working offline | Can't commit/view history without server | Can commit, branch, view full history offline |
+| Single point of failure | Yes — if server dies, history can be lost | No — every clone is a full backup |
+| Speed | Slower (network round-trip per operation) | Faster (most operations are local) |
+| Collaboration model | Everyone talks to one central copy | Each dev has their own repo; they sync/merge with others |
+
+**Why Git won:** offline work, no single point of failure, and drastically faster day-to-day operations (commit, log, diff, branch) since they don't touch the network.
+
+---
+
+## 3. Git vs GitHub
+
+- **Git** = the version control *software* installed on your machine. Works with zero internet connection.
+- **GitHub** = a *website/cloud platform* that hosts Git repositories remotely, adds collaboration tools (Pull Requests, Issues, Actions), and provides a social/discovery layer for code.
+
+> Git is the engine. GitHub is one of several garages you can park that engine in (others: GitLab, Bitbucket, Azure DevOps).
+
+You can use Git your entire life and never touch GitHub. GitHub cannot exist without Git.
+
+---
+
+## 4. Installing Git
+
+- **Windows:** download the installer from `git-scm.com` → run it (defaults are fine for beginners) → this also installs **Git Bash**, a terminal for running Git commands on Windows.
+- **macOS:** usually pre-installed; if not, install via Xcode Command Line Tools (`xcode-select --install`) or Homebrew (`brew install git`).
+- **Linux:** install via package manager, e.g. `sudo apt install git` (Debian/Ubuntu) or `sudo dnf install git` (Fedora).
+
+**Verify installation:**
+```bash
+git --version
+```
+
+**One-time identity setup** (used to label your commits):
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --list          # view all current settings
+```
+
+---
+
+## 5. How Git Works (Internals)
+
+Git tracks content, not files, using a content-addressable storage system built from a few core object types:
+
+- **Blob** — stores the raw content of a file.
+- **Tree** — like a folder; maps filenames to blobs (and other trees for subfolders).
+- **Commit** — a snapshot pointer: references one tree (the project state), the parent commit(s), author info, timestamp, and message.
+- **Every commit gets a unique SHA-1 hash** (e.g., `a1b2c3d...`) generated from its content — this is how Git detects if anything changed.
+
+### The Three Trees / Areas
+```
+Working Directory   →   Staging Area (Index)   →   Local Repository (.git)
+   (your files)          (git add)                    (git commit)
+```
+
+- **Working Directory** — the actual files you see and edit.
+- **Staging Area / Index** — a draft list of what will go into the next commit.
+- **.git folder** — the hidden database in your project root holding the entire history, all commits, branches, and configuration. Deleting it removes all Git tracking (but not your working files).
+
+### HEAD
+`HEAD` is a pointer to your **current position** — usually the tip of the branch you're on. When you switch branches, `HEAD` moves.
+
+---
+
+## 6. Hands-on Git — Core Commands
+
+```bash
+git init                     # start tracking the current folder as a Git repo
+git status                   # see current state: staged / unstaged / untracked files
+git add <file>                # stage a specific file
+git add .                     # stage everything changed
+git commit -m "message"       # save staged changes as a permanent snapshot
+git log                       # view commit history
+git log --oneline             # condensed one-line-per-commit view
+git diff                      # see line-by-line unstaged changes
+git diff --staged             # see line-by-line staged changes
+```
+
+---
+
+## 7. Git Scenario 1: Single-User Setup (Local Workflow)
+
+A typical solo workflow on your own machine, no GitHub yet:
+
+```bash
+mkdir my-project && cd my-project
+git init
+# create/edit files...
+git status
+git add .
+git commit -m "Initial commit"
+# repeat: edit → add → commit
+git log --oneline
+```
+
+**Undo / fix mistakes:**
+```bash
+git restore <file>            # discard uncommitted changes in working directory
+git restore --staged <file>   # unstage a file (keep the edits)
+git commit --amend -m "new message"   # edit the most recent commit
+git reset --soft HEAD~1       # undo last commit, keep changes staged
+git reset --hard HEAD~1       # undo last commit, DELETE the changes entirely (careful!)
+```
+
+---
+
+## 8. Ignoring Files (`.gitignore`)
+
+Some files should never be tracked — build outputs, dependency folders, secrets, OS files (e.g. `node_modules/`, `.env`, `.DS_Store`, `*.log`).
+
+Create a file named exactly **`.gitignore`** in the project root:
+```
+# .gitignore example
+node_modules/
+.env
+*.log
+dist/
+.DS_Store
+```
+
+- Lines are patterns; Git will skip matching files/folders from being staged or shown as "untracked" in `git status`.
+- **Note:** `.gitignore` only stops *new*, untracked files. If a file is already being tracked, adding it to `.gitignore` won't remove it — you must untrack it manually:
+```bash
+git rm --cached <file>
+```
+
+---
+
+## 9. Tracking Empty Directories
+
+Git tracks **files**, not folders — an empty folder is invisible to Git and won't be included in a commit or pushed.
+
+**Workaround:** place a placeholder file inside the empty folder, commonly:
+```bash
+touch my-empty-folder/.gitkeep
+```
+`.gitkeep` isn't a special Git feature — it's just a convention (any dummy file works). Its only purpose is to give the folder content so Git has something to track.
+
+---
+
+## 10. Branching
+
+A **branch** is an independent, movable pointer to a line of commits — it lets you work on new features/fixes without touching the main codebase until you're ready.
+
+```bash
+git branch                     # list all local branches
+git branch <name>              # create a new branch
+git checkout <name>            # switch to a branch
+git checkout -b <name>         # create AND switch in one step
+git switch <name>              # modern alternative to checkout (switch only)
+git switch -c <name>           # modern alternative to checkout -b
+git branch -d <name>           # delete a branch (safe — blocks if unmerged)
+git branch -D <name>           # force-delete a branch
+```
+
+**Merging a branch back into `main`:**
+```bash
+git checkout main
+git merge <branch-name>
+```
+
+Git will attempt a **fast-forward merge** if `main` hasn't diverged, or create a **merge commit** if both branches have separate changes.
+
+---
+
+## 11. Merge Conflicts
+
+A conflict happens when **two branches change the same lines of the same file differently**, and Git can't automatically decide which version to keep.
+
+When it happens, Git marks the conflicting section directly in the file:
+```
+<<<<<<< HEAD
+your current branch's version
+=======
+the incoming branch's version
+>>>>>>> branch-name
+```
+
+**Resolving a conflict:**
+1. Open the file, manually decide what the final content should be.
+2. Delete the `<<<<<<<`, `=======`, `>>>>>>>` markers.
+3. Stage the resolved file: `git add <file>`
+4. Complete the merge: `git commit`
+
+```bash
+git merge --abort     # cancel a merge entirely and go back to pre-merge state
+```
+
+---
+
+## 12. Stashing in Git
+
+`git stash` temporarily **shelves uncommitted changes** so you can switch branches or pull cleanly without committing half-finished work.
+
+```bash
+git stash                # save current uncommitted changes, revert working dir to last commit
+git stash list            # view all stashed entries
+git stash pop              # reapply the most recent stash AND remove it from the stash list
+git stash apply            # reapply the most recent stash but KEEP it in the stash list
+git stash drop              # delete a specific stash without applying it
+git stash clear              # delete all stashes
+```
+
+---
+
+## 13. Git Tags
+
+A **tag** marks a specific commit as important — typically used to mark **release points** (e.g., `v1.0`, `v2.1.3`).
+
+```bash
+git tag                          # list all tags
+git tag v1.0                     # create a lightweight tag on the current commit
+git tag -a v1.0 -m "First release"   # create an annotated tag (stores author, date, message)
+git push origin v1.0             # push a specific tag to GitHub
+git push origin --tags           # push ALL tags to GitHub
+git tag -d v1.0                  # delete a local tag
+```
+
+Unlike branches, tags don't move — they permanently point to one commit.
+
+---
+
+## 14. Git Rebase
+
+**Rebasing** replays your branch's commits on top of another branch's latest commit, creating a **cleaner, linear history** compared to merging (which creates a merge commit with two parent lines).
+
+```bash
+git checkout feature-branch
+git rebase main
+```
+
+This rewrites your feature branch's commits as if they were made *after* the latest changes on `main`.
+
+**Merge vs Rebase:**
+
+| | Merge | Rebase |
+|---|---|---|
+| History | Preserves exact history, adds a merge commit | Rewrites history into a straight line |
+| Safety | Safe on shared/public branches | **Never rebase commits already pushed/shared with others** — it rewrites commit hashes and breaks collaborators' history |
+| Use case | Combining finished feature branches | Cleaning up your own local branch before merging/pushing |
+
+**Golden rule of rebase:** only rebase commits that exist solely on your local machine and haven't been pushed/shared yet.
+
+---
+
+## 15. Using GitHub to Host Repositories
+
+**Connecting a local repo to GitHub:**
+```bash
+git remote add origin <repo-url>     # link local repo to a GitHub repo
+git remote -v                        # view configured remotes
+git push -u origin main              # first push — sets upstream link
+git push                             # every push after that
+```
+
+**Cloning an existing GitHub repo:**
+```bash
+git clone <repo-url>
+```
+
+**Keeping local in sync with remote:**
+```bash
+git pull origin main       # fetch + merge latest changes from GitHub
+git fetch origin           # fetch only, without merging
+```
+
+**Key GitHub concepts:**
+- **Fork** — your own personal copy of someone else's repo, under your GitHub account.
+- **Pull Request (PR)** — a formal request to merge changes from one branch/fork into another, usually with code review before merging.
+- **Issues** — GitHub's built-in tracker for bugs, tasks, and feature requests.
+- **README.md** — Markdown file shown as the repo's homepage/description.
+
+---
+
+## 16. GitHub Desktop — GUI for Git and GitHub
+
+**GitHub Desktop** is a free visual application that wraps common Git/GitHub operations in a point-and-click interface — useful for beginners or anyone who prefers not to memorize commands.
+
+Typical GUI workflow: it visually shows changed files (diff view), lets you select which files/lines to stage, write a commit message in a text box, and click buttons for **Commit**, **Push**, **Pull**, **Fetch**, **Create Branch**, and **Create Pull Request** — all without touching the terminal.
+
+Good for beginners, but understanding the underlying commands is still valuable since most professional teams work from the terminal.
+
+---
+
+## 17. Using Git in VS Code
+
+VS Code has **built-in Git integration** (no plugin needed for basics):
+- The **Source Control panel** (branch icon in the sidebar) shows all changed/staged/untracked files.
+- You can stage files (`+` icon), write a commit message, and commit — all from the UI.
+- Inline **diff view** highlights exactly what changed, line by line, with green/red markers in the editor gutter.
+- Branch name and sync status (ahead/behind commits) shown in the bottom-left status bar — click it to switch or create branches.
+- Built-in **merge conflict editor** shows "Accept Current / Accept Incoming / Accept Both / Compare" buttons directly above conflicting sections.
+- Popular extensions that add more power: **GitLens** (blame annotations, history exploration), **GitHub Pull Requests and Issues** (manage PRs without leaving VS Code).
+
+---
+
+## 18. Git Scenario 2: Multi-User Setup (Team Collaboration)
+
+When multiple people work on the same repo, the typical flow is:
+
+1. **Clone** the shared repo: `git clone <repo-url>`
+2. **Create a feature branch** for your task: `git checkout -b feature/login-page`
+3. Make changes, commit locally as usual.
+4. **Push your branch** to GitHub: `git push -u origin feature/login-page`
+5. Open a **Pull Request** on GitHub comparing your branch to `main`.
+6. Teammates **review** the PR (comments, suggested changes).
+7. Once approved, the PR is **merged** into `main` (often via GitHub's "Merge", "Squash and merge", or "Rebase and merge" button).
+8. Everyone else **pulls** the updated `main`: `git pull origin main`
+
+**Handling conflicts in a team:** always `git pull` (or `fetch` + `merge`/`rebase`) before starting new work and before pushing, to minimize conflicts with teammates' changes.
+
+---
+
+## 19. Modern Git Workflow
+
+A common professional standard, combining the concepts above:
+
+1. `main` (or `master`) branch is always kept **stable and deployable**.
+2. All new work happens on **short-lived feature branches** (`feature/xyz`, `fix/bug-123`).
+3. Commits are small, focused, and have clear messages (often following a convention like **Conventional Commits**: `feat: add login form`, `fix: correct off-by-one error`).
+4. Work is pushed regularly and opened as a **Pull Request** early for visibility.
+5. **Code review** happens before merging — automated checks (CI/CD, e.g. GitHub Actions) often run tests automatically on the PR.
+6. After merge, the feature branch is **deleted** to keep the repo clean.
+7. Releases are marked using **tags** (e.g., `v1.2.0`).
+
+This branch-per-feature + PR + review + merge cycle is often called **GitHub Flow**, a simplified alternative to the older, more complex "Git Flow" model (which adds `develop`, `release`, and `hotfix` branches).
+
+---
+
+## Quick Reference — Full Command Cheat Sheet
+
+```bash
+# Setup
+git config --global user.name "Name"
+git config --global user.email "email"
+
+# Starting
+git init
+git clone <url>
+
+# Basic workflow
+git status
+git add <file> | git add .
+git commit -m "message"
+git push origin main
+git push -u origin main      # first push only
+git pull origin main
+
+# Branching
+git branch
+git checkout -b <name>
+git switch -c <name>
+git merge <branch>
+git branch -d <name>
+
+# History & inspection
+git log --oneline
+git diff
+
+# Undo
+git restore <file>
+git restore --staged <file>
+git commit --amend -m "msg"
+git reset --soft HEAD~1
+git reset --hard HEAD~1
+
+# Stash
+git stash
+git stash pop
+
+# Tags
+git tag -a v1.0 -m "message"
+git push origin --tags
+
+# Rebase (only on unshared commits!)
+git rebase main
+
+# Remotes
+git remote add origin <url>
+git remote -v
+```
