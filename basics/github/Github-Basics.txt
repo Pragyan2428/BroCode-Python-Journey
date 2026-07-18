@@ -1,0 +1,166 @@
+# Git & GitHub — Complete Notes
+
+## 1. What is Git?
+
+**Git** is a **Version Control System (VCS)** — software that tracks changes to files over time, so you can:
+- See the full history of every change made to your code
+- Revert to a previous version if something breaks
+- Work on features in isolation (branches) without breaking the main codebase
+- Collaborate with multiple people on the same project without overwriting each other's work
+
+**Key properties of Git:**
+- **Distributed** — every developer has a full copy of the project's history on their own machine, not just on a central server.
+- **Free and open source.**
+- **Fast** — most operations (commit, diff, branch, merge) happen locally, so they're near-instant.
+- **Scalable** — used by projects with a handful of files and by massive codebases with thousands of contributors (e.g., the Linux kernel).
+
+Git runs **locally on your computer** via the command line (or a GUI). It does **not** require the internet to function — you only need internet when syncing with a remote host like GitHub.
+
+---
+
+## 2. What is GitHub?
+
+**GitHub** is a **cloud-based hosting platform** for Git repositories. It is a website/service, not version control software itself.
+
+Think of it this way:
+> Git = the engine (does the actual version tracking)
+> GitHub = the garage where you park and share your project online
+
+**What GitHub adds on top of Git:**
+- Remote (cloud) backup of your repositories
+- A web interface to browse code, history, and changes
+- Collaboration tools: Pull Requests, Issues, code review, discussions
+- Project management: Kanban-style Project boards
+- Automation: GitHub Actions (CI/CD)
+- Social/discovery features: stars, forks, followers
+
+**Note:** GitHub is *one* Git hosting service among several. Alternatives include **GitLab** and **Bitbucket** — they all use Git underneath.
+
+---
+
+## 3. Core Terminology
+
+| Term | Meaning |
+|---|---|
+| **Repository (repo)** | The project itself — a folder containing all your files *plus* their entire tracked history. Not a single file. |
+| **Local repository** | The copy of the repo on your own computer. |
+| **Remote repository** | The copy hosted online (e.g., on GitHub). Commonly nicknamed `origin`. |
+| **Commit** | A saved snapshot of your project at a point in time, with a message describing what changed. |
+| **Branch** | An independent line of development. `main` (or `master`) is the default branch. |
+| **Clone** | Downloading a copy of a remote repo to your local machine. |
+| **Staging area (Index)** | A holding area where you select which changes will go into the *next* commit. |
+| **Working directory** | The actual files on your disk that you're currently editing. |
+| **`.gitignore`** | A file listing files/folders Git should *not* track (e.g., `node_modules/`, `.env`). |
+| **`README.md`** | A Markdown file, usually shown on the repo's GitHub homepage, describing the project. |
+| **`.md`** | File extension for **Markdown** — a lightweight text formatting language (used for `README.md`, docs, notes, etc.). |
+| **Fork** | Your own personal copy of *someone else's* GitHub repo. |
+| **Pull Request (PR)** | A request to merge changes from one branch (or fork) into another, usually reviewed before merging. |
+| **Issue** | A tracked task, bug report, or feature request on GitHub. |
+| **Clone vs Fork** | Clone = copy to your local machine. Fork = copy to *your own GitHub account* (usually done before cloning someone else's project). |
+
+---
+
+## 4. The Three States of a File in Git
+
+Every tracked file moves through these stages:
+
+```
+Working Directory  →  Staging Area  →  Local Repository  →  Remote Repository
+   (edit file)          (git add)         (git commit)          (git push)
+```
+
+| Stage | State | Command that moves it here |
+|---|---|---|
+| 1 | **Modified** — file changed, not yet tracked for the next commit | (just editing) |
+| 2 | **Staged** — file marked to be included in the next commit | `git add` |
+| 3 | **Committed** — change permanently saved in local history | `git commit` |
+| 4 | **Pushed** — local commits uploaded to the remote (GitHub) | `git push` |
+
+---
+
+## 5. Essential Commands
+
+### Setup (one-time, per machine)
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+### Starting a repository
+```bash
+git init                    # turn current folder into a Git repo
+git clone <repo-url>        # copy an existing remote repo locally
+```
+
+### The core commit workflow
+```bash
+git status                  # see what's changed / staged / untracked
+git add .                   # stage ALL changed files
+git add <filename>          # stage a specific file
+git commit -m "message"     # save staged changes as a snapshot
+git push origin main        # upload local commits to GitHub
+```
+
+> **Correction to common confusion:** `git commit -m "message"` does **not** "upscale" files anywhere — it takes what's currently *staged* and permanently records it as a snapshot in your **local** history. Nothing reaches GitHub until you `push`.
+
+### First push vs. every push after
+```bash
+git push -u origin main     # FIRST push only — links local 'main' to remote 'main'
+git push                    # every push AFTER that — no need to repeat -u
+```
+`-u` (`--set-upstream`) tells Git "remember this remote+branch as the default target." Once set, plain `git push` / `git pull` know where to go automatically. It is **not** something you repeat on every push — it's a one-time link-up per branch.
+
+### Syncing with the remote
+```bash
+git pull origin main        # download + merge latest changes from GitHub
+git fetch origin            # download changes but don't merge yet
+```
+
+### Branching
+```bash
+git branch                  # list branches
+git branch <name>           # create a new branch
+git checkout <name>         # switch to a branch
+git checkout -b <name>      # create AND switch in one step
+git merge <name>            # merge a branch into your current branch
+```
+
+### Inspecting history
+```bash
+git log                     # full commit history
+git log --oneline           # condensed, one line per commit
+git diff                    # see unstaged changes
+```
+
+### Undoing things
+```bash
+git restore <file>          # discard uncommitted changes to a file
+git reset HEAD <file>       # unstage a file (keep the edits)
+git revert <commit-hash>    # safely undo a commit by creating a new commit
+```
+
+---
+
+## 6. Typical Beginner Workflow, Start to Finish
+
+```bash
+git clone <repo-url>              # 1. get the project
+cd project-folder                 # 2. move into it
+# ...make changes to files...
+git status                        # 3. check what changed
+git add .                         # 4. stage changes
+git commit -m "describe the fix"  # 5. save a snapshot locally
+git push origin main              # 6. upload to GitHub (git push -u origin main if first time)
+```
+
+---
+
+## 7. Quick Reference — Common Mix-ups
+
+| ❌ Misconception | ✅ Reality |
+|---|---|
+| GitHub is software used to manage repos with Git | Git is the software; GitHub just *hosts* Git repos on the web |
+| A repository is a file | A repository is a whole project folder + its full history |
+| `git commit` sends code to GitHub | `git commit` only saves a snapshot **locally**; `git push` sends it to GitHub |
+| `-u` is used for repeated pushes to the same folder | `-u` is used **once**, on the first push, to link local and remote branches |
+| You need internet to use Git | You only need internet to `push`/`pull`/`clone` — everything else is local |
