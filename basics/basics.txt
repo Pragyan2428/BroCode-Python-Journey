@@ -41,4 +41,37 @@ a = int(a)
 there are some ways:
 int(),str(),bool(),float()
 
+user input(): helps you to takes input from the user,also it returns the value as an string.
+Then comes:
+Arithematic and math module:
+so inside math module: import math()
+we get :
+1. abs()
+2. min()
+3. max()
+4. round()
+5. pow(value,base)
+6. sqrt()
+7. ceil():gives you the upper value
+8. floor():gives you the lower value
+9. hupt():gives you the hypotenuse for a right angle triangle.
 
+then comes:
+looping:
+process of iterating something under a conditions.
+
+there are many kinds of loops:
+1.if-else
+2.elif
+3.while and so on.
+
+then comes:
+condtional statements: these are basically known as the ternary statements, which ehlps us to write a certain if -else statement in short fprm.
+ex:
+if():
+    blaahhhh
+else:
+    blaahhhh
+
+this can be written as :x balh if condyion else y balh
+ex: "Positive" if x>0 else "Negative"
