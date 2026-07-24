@@ -25,3 +25,20 @@ elif
 while 
 do-while
 
+Day pta nhi :
+lets restart:
+so aaj revise karna tha :
+we started form variables and .
+Varuables: container used to stire some values.
+there are different types of variableson the basis of their datatypes:
+some common one are :
+string, int , float and bool.
+then comes ,
+Types casting:method of conversion from one datatype to another.
+ex:
+a='1'
+a = int(a)
+there are some ways:
+int(),str(),bool(),float()
+
+
