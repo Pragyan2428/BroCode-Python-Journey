@@ -75,3 +75,10 @@ else:
 
 this can be written as :x balh if condyion else y balh
 ex: "Positive" if x>0 else "Negative"
+
+
+then comes:
+string methods:
+basically,these are the modules that comes under the string module.
+some methods are given below:
+len(str)

@@ -1,0 +1,4 @@
+A function is a block of code that is reusable .to invoke a function we use small brackets.
+Ex:
+def function_name ():
+    #content
