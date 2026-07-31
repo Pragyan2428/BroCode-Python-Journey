@@ -1,4 +1,4 @@
-Basically these are the operators which helps to see whether a value is present or not.
+Basically these are the operators which helps to see whether a value is present or not found in a sequence.
 Types: in , not in 
 example:
 for value in values:
