@@ -1,0 +1,8 @@
+Basically these are the operators which helps to see whether a value is present or not.
+Types: in , not in 
+example:
+for value in values:
+    #content
+
+for value notin values:
+    #content
